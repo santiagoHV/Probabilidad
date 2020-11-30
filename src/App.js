@@ -7,6 +7,7 @@ import Probabilidad_binomial from './Components/Probabilidad/Probabilidad_binomi
 import DiscretasComponent from './Components/Probabilidad/DiscretasComponent';
 
 function App() {
+  
   return (
     <BrowserRouter>
       <NavbarComponent />
