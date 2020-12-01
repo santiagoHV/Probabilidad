@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { MathComponent as Math} from 'mathjax-react';
-import {Form, FormGroup, Input, Label, Col} from 'reactstrap';
+import {Form, FormGroup, Input, Label, Col, Button, Table} from 'reactstrap';
 import '../../assets/operations'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-var enumer =  [0,1,2];
+var enumer =  [];
+var textEnumer = '';
 
 class DiscretasComponent extends Component {
 
@@ -17,29 +18,37 @@ class DiscretasComponent extends Component {
             exitos: 3,
             muestra: 2, 
         };
-        
-        this.handleOnchange = this.handleOnchange.bind(this);
+        this.handleReCalculate = this.handleReCalculate.bind(this);
+        this.setEnumer(2);
     }
 
     setEnumer(limit){
+        enumer = [];
+        textEnumer = '';
         for(var i = 0; i <= limit; i++){
-            enumer.push(i)
+            enumer.push(i);
+            textEnumer = textEnumer + i + ', ';
         }
+        textEnumer = textEnumer.slice(0,-2)
     }
-    handleOnchange(event){
-        const target = event.target;
-        const name = target.name;
-        const value = target.value;
-
+    handleReCalculate(event){
+        alert("poblacion actual "+this.poblacion.value);
         this.setState({
-            [name]: value
+            poblacion: this.poblacion.value,
+            exitos: this.exitos.value,
+            muestra: this.muestra.value
         });
+        this.setEnumer(this.muestra.value);
+        event.preventDefault();
     }
     combinatoria(n,x){
         return (this.factorial(n)/(this.factorial(x)*(this.factorial(n-x))));
       }
     factorial(x){
-        if(x === 0){
+        if(x == null){
+            return 0;
+        }
+        else if(x === 0){
             return 1;
         }
         else return x*this.factorial(x-1);
@@ -56,8 +65,16 @@ class DiscretasComponent extends Component {
                     </div>
                 );
         });
-        console.log(this.combinatoria(this.state.exitos,0));
-        console.log(this.combinatoria(this.state.poblacion - this.state.exitos,this.state.muestra - 0));
+        const tableResults = enumer.map((i) => {
+            return(
+                <th><Math tex={String.raw`\frac{${this.combinatoria(this.state.exitos,i) * this.combinatoria(this.state.poblacion - this.state.exitos,this.state.muestra - i)}}{${this.combinatoria(this.state.poblacion,this.state.muestra)}}`}/></th>
+            );
+        });
+        const tableTitles = enumer.map((i) => {
+            return(
+                <th><Math tex={String.raw`${enumer[i]}`}/></th>
+            );
+        });
         return (
             <div className="">
                 <h2>Distribución discreta de probabilidad </h2>
@@ -93,14 +110,14 @@ class DiscretasComponent extends Component {
                         Un embarque de <strong>C</strong> computadoras portátiles similares para una tienda minorista contiene <strong>D</strong> que están defectuosas. Si una escuela compra al azar <strong>A</strong> de estas computadoras, calcule la distribución de probabilidad para el número de computadoras defectuosas.
                         </div>
                         <div className="col-md-4 col-12 edit-zone pt-2">
-                            <Form>
+                            <Form onSubmit={this.handleReCalculate}>
                                 <FormGroup row>
                                     <Label className='offset-1 col-1 mt-2'>C: </Label>
                                     <Col >
                                         <Input type='text' id='poblacion' name='poblacion'
                                         className='col-5'
-                                        value={this.state.poblacion}
-                                        onChange={this.handleOnchange}/>
+                                        defaultValue={this.state.poblacion}
+                                        innerRef={(input) => this.poblacion = input}/>
                                     </Col>
                                 </FormGroup>
                                 <FormGroup row>
@@ -108,8 +125,8 @@ class DiscretasComponent extends Component {
                                     <Col >
                                         <Input type='text' id='exitos' name='exitos' 
                                         className='col-5'
-                                        value={this.state.exitos}
-                                        onChange={this.handleOnchange} />
+                                        defaultValue={this.state.exitos}
+                                        innerRef={(input) => this.exitos = input} />
                                     </Col>
                                 </FormGroup>
                                 <FormGroup row>
@@ -117,10 +134,11 @@ class DiscretasComponent extends Component {
                                     <Col >
                                         <Input type='text' id='muestra' name='muestra' 
                                         className='col-5'
-                                        value={this.state.muestra}
-                                        onChange={this.handleOnchange}/>
+                                        defaultValue={this.state.muestra}
+                                        innerRef={(input) => this.muestra = input}/>
                                     </Col>
                                 </FormGroup>
+                                <Button type='submit' className='offset-1 col-6 bg-primary'>Recalcular</Button>
                             </Form>
                         </div>
                     </div>
@@ -128,11 +146,29 @@ class DiscretasComponent extends Component {
                 <h5 className='ml-4'>Solución</h5> 
                 <div className='row  mt-2'>
                     <div className=' ml-4 col-10 comun-text'>
-                    Sea X una variable aleatoria cuyos valores x son los números posibles de computadoras defectuosas compradas por la escuela. Entonces x sólo puede asumir los números 0, 1 y 2. Así:
+                    Sea X una variable aleatoria cuyos valores x son los números posibles de computadoras defectuosas compradas por la escuela. Entonces x sólo puede asumir los números {textEnumer}. Así:
+                    </div>
+                    <div className='comment'>
+                        <strong>*Solución de cada operación individual en la sección de distribución hipergeométrica*</strong>
                     </div>
                 </div>   
                 <div className='row m-3'>
                     {operations}
+                </div>
+                <div className='row m-3'>
+                    Por consiguiente, la distribución de probabilidad de X es:
+                    <Table className='col-12 mr-4 mt-3 math'>
+                        <thead>
+                            <th><Math tex={String.raw`X`}/></th>
+                            {tableTitles}
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope='row'><Math tex={String.raw`f(x)`}/></th>
+                                {tableResults}
+                            </tr>
+                        </tbody>
+                    </Table>
                 </div>
             </div>
         )

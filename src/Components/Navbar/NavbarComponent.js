@@ -92,6 +92,19 @@ const NavbarComponent = (props) => {
                 </NavLink>
               </DropdownMenu>
             </UncontrolledDropdown>
+            <UncontrolledDropdown nav inNavbar className="nav-item">
+              <DropdownToggle nav caret >
+                Distribuciones de probabilidad discreta
+              </DropdownToggle>
+              <DropdownMenu right>
+                <NavLink href="/hipergeometrica">
+                    <DropdownItem>
+                    Distribución hipergeométrica
+                    </DropdownItem>
+                </NavLink>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+            
           </Nav>
         </Collapse>
       </Navbar>
